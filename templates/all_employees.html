@@ -1,3 +1,4 @@
+{% load humanize %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -28,8 +29,8 @@
                                   <a href="/employees/{{ employee.id }}">{{ employee.name }}</a>
                               </td>
                               <td>{{ employee.email }}</td>
-                              <td>{{ employee.dob }}</td>
-                              <td>{{ employee.salary }}</td>
+                              <td>{{ employee.dob | date: 'd-m-y' }}</td>
+                              <td>{{ employee.salary | intcomma }}</td>
                           </tr>
                        {% endfor %}
                     </tbody>
