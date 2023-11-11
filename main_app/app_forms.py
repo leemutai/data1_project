@@ -9,7 +9,7 @@ class EmployeeForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             "dob": forms.DateInput(attrs={"type": "date", "min": "1990-01-01", "max": "2005-12-31"}),
-            "salary": forms.NumberInput(attrs={"max":75000, "min":10000})
+            "salary": forms.NumberInput(attrs={"max": 75000, "min": 10000})
         }
 
         labels = {
