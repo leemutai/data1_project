@@ -73,7 +73,7 @@ def employee_update(request, emp_id):
         form = EmployeeForm(request.POST, request.FILES, instance=employee)
         if form.is_valid():
             form.save()
-            messages.success(request="Employee updated successfully")
+            messages.success(request, "Employee updated successfully")
             return redirect('details', emp_id)
 
     else:
