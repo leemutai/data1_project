@@ -1,15 +1,18 @@
 from datetime import datetime
 
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, redirect, get_object_or_404
 
-from main_app.app_forms import EmployeeForm
+from main_app.app_forms import EmployeeForm, LoginForm
 from main_app.models import Employee
 
 
 # Create your views here.
+@login_required
 def home(request):
     if request.method == "POST":
         form = EmployeeForm(request.POST, request.FILES)
@@ -27,6 +30,7 @@ def home(request):
 
 # All employees
 # One employee
+@login_required
 def all_employees(request):
     # employees = Employee.objects.filter(name__istartswith="La", salary__gt=45000).order_by("dob")
     # employees = Employee.objects.all().order_by("-salary")
@@ -42,11 +46,13 @@ def all_employees(request):
     return render(request, "all_employees.html", {"employees": data})
 
 
+@login_required
 def employee_details(request, emp_id):
     employee = Employee.objects.get(pk=emp_id)  # SELECT * FROM employees WHERE id=1
     return render(request, "employee_details.html", {"employee": employee})
 
 
+@login_required
 def employee_delete(request, emp_id):
     employee = get_object_or_404(Employee, pk=emp_id)
     employee.delete()
@@ -55,6 +61,7 @@ def employee_delete(request, emp_id):
     return redirect("all")
 
 
+@login_required
 def search_employees(request):
     search_word = request.GET["search_word"]
     employees = Employee.objects.filter(
@@ -67,6 +74,7 @@ def search_employees(request):
     return render(request, "all_employees.html", {"employees": data})
 
 
+@login_required
 def employee_update(request, emp_id):
     employee = get_object_or_404(Employee, pk=emp_id)  # SELECT * FROM employees WHERE id=1
     if request.method == "POST":
@@ -80,3 +88,26 @@ def employee_update(request, emp_id):
         form = EmployeeForm(instance=employee)
 
     return render(request, "update.html", {"form": form})
+
+
+def signin(request):
+    if request.method == "GET":
+        form = LoginForm()
+        return render(request, "login.html", {"form": form})
+    elif request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=username, password=password)
+            if user:
+                login(request, user)
+                return redirect('home')
+        messages.error(request, "Wrong username or password")
+    return render(request, "login.html", {"form": form})
+
+
+@login_required
+def signout(request):
+    logout(request)
+    return redirect('signin')
